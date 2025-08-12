@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Головна - Game Library{% endblock %}
+
+{% block content %}
+<section class="hero-banner bg-light py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                    <img src="{{ url_for('static', filename='images/game-library-hero.jpg') }}" 
+                    alt="Game Library" class="img-fluid" style="max-height: 300px;">
+                <h1 class="display-4 fw-bold">Ваша ігрова колекція</h1>
+                <p class="lead">Зберігайте, організовуйте та аналізуйте свою колекцію відеоігор</p>
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{{ url_for('add_game') }}" class="btn btn-primary btn-lg px-4">
+                        <i class="fas fa-plus-circle me-2"></i>Додати гру
+                    </a>
+                    <a href="{{ url_for('import_games') }}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-file-import me-2"></i>Імпорт ігор
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="{{ url_for('static', filename='images/game-library-hero.png') }}" 
+                     alt="Game Library" class="img-fluid" style="max-height: 300px;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features mb-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Чому Game Library?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary text-white rounded-circle p-3 mb-3 mx-auto">
+                            <i class="fas fa-cloud-download-alt fa-2x"></i>
+                        </div>
+                        <h3 class="h4">Імпорт ігор</h3>
+                        <p class="mb-0">Імпортуйте ваші ігри з популярних платформ: Steam, Epic Games, GOG.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-success text-white rounded-circle p-3 mb-3 mx-auto">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                        <h3 class="h4">Статистика</h3>
+                        <p class="mb-0">Аналізуйте час, проведений у іграх, та оцінюйте свої улюблені проекти.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-info text-white rounded-circle p-3 mb-3 mx-auto">
+                            <i class="fas fa-search fa-2x"></i>
+                        </div>
+                        <h3 class="h4">Потужний пошук</h3>
+                        <p class="mb-0">Знаходьте ігри за назвою, жанром, платформою чи роком випуску.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="recent-games">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Останні додані ігри</h2>
+            <a href="{{ url_for('game_list') }}" class="btn btn-outline-secondary">
+                Переглянути всі <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <!-- Тут буде цикл для виведення ігор -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="https://via.placeholder.com/300x150?text=Game+Cover" class="card-img-top" alt="Назва гри">
+                    <div class="card-body">
+                        <h5 class="card-title">The Witcher 3: Wild Hunt</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-primary">RPG</span>
+                            <span class="text-muted">2015</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="rating text-warning me-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-muted">4.5/5</span>
+                        </div>
+                        <p class="card-text"><i class="fas fa-clock me-1"></i> 87 годин</p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="#" class="btn btn-sm btn-outline-primary">Детальніше</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Повторити для інших ігор -->
+        </div>
+    </div>
+</section>
+{% endblock %}

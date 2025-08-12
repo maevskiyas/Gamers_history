@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Моя бібліотека ігор — плитками{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Моя бібліотека ігор</h2>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('add_game') }}" class="btn btn-primary">Додати гру</a>
+      <a href="{{ url_for('game_list', view='list') }}" class="btn btn-outline-secondary">Показати списком</a>
+    </div>
+  </div>
+
+  {% if user_games %}
+    <div class="row">
+      {% for link in user_games %}
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            {% set cover = link.game.cover %}
+            <div class="card-img-top" style="height: 200px; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center;">
+              {% if cover %}
+                {% if '://' in cover %}
+                  <img src="{{ cover }}" class="img-fluid rounded" style="object-fit: cover; height: 100%; width: 100%;" alt="cover">
+                {% else %}
+                  <img src="{{ url_for('static', filename='uploads/' ~ cover) }}" class="img-fluid rounded" style="object-fit: cover; height: 100%; width: 100%;" alt="cover">
+                {% endif %}
+              {% else %}
+                <div class="bg-light text-muted d-flex align-items-center justify-content-center rounded" style="width: 100%; height: 100%; font-size: 1.25rem; color: #888;">
+                  
+                </div>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">{{ link.game.title }}</h5>
+              <p class="card-text">Платформа: {{ link.game.platform }}</p>
+              <p class="card-text">Рік: {{ link.game.release_year or '—' }}</p>
+              <p class="card-text">Години: {{ link.hours_played or 0 }}</p>
+              <p class="card-text">Оцінка: {{ link.rating or '—' }}</p>
+              <a href="{{ url_for('delete_user_game', game_id=link.game.id) }}" class="btn btn-outline-danger">Видалити</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-5">
+      <p class="mb-3 text-muted">У тебе ще немає доданих ігор.</p>
+      <a href="{{ url_for('add_game') }}" class="btn btn-primary">Додати першу гру</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

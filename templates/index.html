@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Моя бібліотека - Game Library{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Моя бібліотека ігор</h1>
+
+    <!-- Форма для пошуку -->
+    <form method="GET" action="{{ url_for('search_games') }}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="query" class="form-control" placeholder="Пошук гри..." value="{{ request.args.get('query', '') }}">
+            <button class="btn btn-primary" type="submit">Пошук</button>
+        </div>
+    </form>
+
+    {% if games %}
+    <h2>Результати пошуку:</h2>
+    <div class="row">
+        {% for game in games %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if game['background_image'] %}
+                    <img src="{{ game['background_image'] }}" class="card-img-top" alt="Cover Image">
+                {% else %}
+                    <div class="card-img-top" style="height: 200px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center;">
+                        <span class="text-muted">Немає обкладинки</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ game['name'] }}</h5>
+                    <p class="card-text">Платформа: {{ game['platforms'][0]['platform']['name'] if game['platforms'] else 'Невідомо' }}</p>
+                    <p class="card-text">Рік випуску: {{ game['released'][:4] if game['released'] else 'Невідомо' }}</p>
+
+                    <!-- Додати гру до бібліотеки -->
+                    <form method="POST" action="{{ url_for('add_game_to_library', game_id=game['id']) }}">
+                        <button type="submit" class="btn btn-primary btn-sm">Додати до бібліотеки</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">Немає результатів для вашого запиту.</p>
+    {% endif %}
+
+    <!-- Відображення бібліотеки користувача -->
+    <h2 class="mt-5">Мої ігри</h2>
+
+    {% if user_games %}
+    <div class="row">
+        {% for user_game in user_games %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if user_game.game.cover %}
+                    <img src="{{ url_for('static', filename='uploads/' ~ user_game.game.cover) }}" class="card-img-top" alt="Cover Image">
+                {% else %}
+                    <div class="card-img-top" style="height: 200px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center;">
+                        <span class="text-muted">Немає обкладинки</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ user_game.game.title }}</h5>
+                    <p class="card-text">Платформа: {{ user_game.game.platform }}</p>
+                    <p class="card-text">Рік випуску: {{ user_game.game.release_year or '—' }}</p>
+                    <p class="card-text">Години зіграно: {{ user_game.hours_played or 0 }}</p>
+                    <p class="card-text">Оцінка: {{ user_game.rating or '—' }}</p>
+                    <a href="{{ url_for('delete_user_game', game_id=user_game.game.id) }}" class="btn btn-danger btn-sm">Видалити</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">У вас ще немає доданих ігор в бібліотеці. Додайте гру!</p>
+    {% endif %}
+</div>
+{% endblock %}

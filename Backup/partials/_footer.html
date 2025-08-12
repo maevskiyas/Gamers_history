@@ -1,0 +1,31 @@
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <h5>Game Library</h5>
+                <p>Ваш особистий каталог відеоігор з можливістю імпорту з популярних платформ.</p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h5>Навігація</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url_for('home') }}" class="text-white">Головна</a></li>
+                    <li><a href="{{ url_for('game_list') }}" class="text-white">Мої ігри</a></li>
+                    <li><a href="{{ url_for('add_game') }}" class="text-white">Додати гру</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Зв'язок</h5>
+                <p>Пишіть нам: <a href="mailto:support@gamelibrary.com" class="text-white">support@gamelibrary.com</a></p>
+                <div class="social-links">
+                    <a href="#" class="text-white me-2"><i class="fab fa-facebook fa-lg"></i></a>
+                    <a href="#" class="text-white me-2"><i class="fab fa-twitter fa-lg"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-discord fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr class="bg-light">
+        <div class="text-center">
+            <p class="mb-0">&copy; 2023 Game Library. Всі права захищені.</p>
+        </div>
+    </div>
+</footer>

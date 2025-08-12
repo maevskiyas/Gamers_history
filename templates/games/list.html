@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Моя бібліотека ігор — список{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Моя бібліотека ігор</h2>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('add_game') }}" class="btn btn-primary">Додати гру</a>
+      <a href="{{ url_for('game_list', view='tiles') }}" class="btn btn-outline-secondary">Показати плитками</a>
+    </div>
+  </div>
+
+  {% if user_games and user_games|length %}
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+        <tr>
+          <th style="width:90px;">Обкладинка</th>
+          <th>Назва</th>
+          <th>Платформа</th>
+          <th>Рік</th>
+          <th>Години</th>
+          <th>Оцінка</th>
+          <th class="text-end" style="width:120px;">Дії</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for link in user_games %}
+          {% set cover = link.game.cover %}
+          <tr>
+            <td>
+              {% if cover %}
+                {% if '://' in cover %}
+                  <img src="{{ cover }}" class="img-fluid rounded" style="max-height:80px;" alt="cover">
+                {% else %}
+                  <img src="{{ url_for('static', filename='uploads/' ~ cover) }}" class="img-fluid rounded" style="max-height:80px;" alt="cover">
+                {% endif %}
+              {% else %}
+                <div class="bg-light text-muted d-flex align-items-center justify-content-center rounded" style="height:60px;">Немає</div>
+              {% endif %}
+            </td>
+            <td class="fw-semibold">{{ link.game.title }}</td>
+            <td>{{ link.game.platform }}</td>
+            <td>{{ link.game.release_year or '—' }}</td>
+            <td>{{ link.hours_played or 0 }}</td>
+            <td>{{ link.rating or '—' }}</td>
+            <td class="text-end">
+                <form method="POST"
+                      action="{{ url_for('delete_user_game', game_id=link.game.id) }}?view=list"
+                      onsubmit="return confirm('Видалити цю гру з бібліотеки?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-sm btn-outline-danger">Видалити</button>
+                </form>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="text-center py-5">
+      <p class="mb-3 text-muted">У тебе ще немає доданих ігор.</p>
+      <a href="{{ url_for('add_game') }}" class="btn btn-primary">Додати першу гру</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
