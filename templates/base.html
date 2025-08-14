@@ -18,7 +18,7 @@
             <ul class="navbar-nav me-auto">
                 {% if current_user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('game_list') }}">Моя бібліотека</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('add_game_to_library', game_id=0) }}">Додати гру</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('add_game') }}">Додати гру</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('import_games') }}">Імпорт</a></li>
                 {% endif %}
             </ul>

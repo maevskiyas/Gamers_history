@@ -14,35 +14,37 @@
         </div>
     </form>
 
-    {% if games %}
-    <h2>Результати пошуку:</h2>
-    <div class="row">
-        {% for game in games %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                {% if game['background_image'] %}
-                    <img src="{{ game['background_image'] }}" class="card-img-top" alt="Cover Image">
-                {% else %}
-                    <div class="card-img-top" style="height: 200px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center;">
-                        <span class="text-muted">Немає обкладинки</span>
-                    </div>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ game['name'] }}</h5>
-                    <p class="card-text">Платформа: {{ game['platforms'][0]['platform']['name'] if game['platforms'] else 'Невідомо' }}</p>
-                    <p class="card-text">Рік випуску: {{ game['released'][:4] if game['released'] else 'Невідомо' }}</p>
+    {% if games is defined %}
+        {% if games %}
+            <h2>Результати пошуку:</h2>
+            <div class="row">
+                {% for game in games %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        {% if game['background_image'] %}
+                            <img src="{{ game['background_image'] }}" class="card-img-top" alt="Cover Image">
+                        {% else %}
+                            <div class="card-img-top" style="height: 200px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center;">
+                                <span class="text-muted">Немає обкладинки</span>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ game['name'] }}</h5>
+                            <p class="card-text">Платформа: {{ game['platforms'][0]['platform']['name'] if game['platforms'] else 'Невідомо' }}</p>
+                            <p class="card-text">Рік випуску: {{ game['released'][:4] if game['released'] else 'Невідомо' }}</p>
 
-                    <!-- Додати гру до бібліотеки -->
-                    <form method="POST" action="{{ url_for('add_game_to_library', game_id=game['id']) }}">
-                        <button type="submit" class="btn btn-primary btn-sm">Додати до бібліотеки</button>
-                    </form>
+                            <!-- Додати гру до бібліотеки -->
+                            <form method="POST" action="{{ url_for('add_game_to_library', game_id=game['id']) }}">
+                                <button type="submit" class="btn btn-primary btn-sm">Додати до бібліотеки</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p class="text-muted">Немає результатів для вашого запиту.</p>
+        {% else %}
+            <p class="text-muted">Немає результатів для вашого запиту.</p>
+        {% endif %}
     {% endif %}
 
     <!-- Відображення бібліотеки користувача -->

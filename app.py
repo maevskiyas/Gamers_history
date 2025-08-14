@@ -78,29 +78,41 @@ def game_list():
 
     return render_template(template, user_games=user_games)
 
-@app.route("/games/add/<int:game_id>", methods=["POST"])
+@app.route("/games/add", methods=["GET", "POST"])
 @login_required
-def add_game_to_library(game_id):
-    game = Game.query.get(game_id)  # Отримуємо гру за ID
-    if game:
-        # Перевірка, чи вже є така гра в бібліотеці користувача
-        existing_link = UserGame.query.filter_by(user_id=current_user.id, game_id=game.id).first()
+def add_game():
+    form = AddGameForm()
+    if form.validate_on_submit():
+        cover_filename = None
+        if form.cover.data and allowed_file(form.cover.data.filename):
+            filename = secure_filename(form.cover.data.filename)
+            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+            form.cover.data.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            cover_filename = filename
 
-        # Якщо гри ще немає в бібліотеці користувача
-        if not existing_link:
-            user_game = UserGame(
-                user_id=current_user.id,
-                game_id=game.id,
-                hours_played=0,  # Початкові значення
-                rating=0,
-                imported_from="manual"
-            )
-            db.session.add(user_game)
-            db.session.commit()
-            flash("Гра додана до вашої бібліотеки!", "success")
-        else:
-            flash("Ця гра вже є у вашій бібліотеці.", "warning")
-    return redirect(url_for('search_games', query=request.args.get('query')))  # Перенаправлення після додавання
+        game = Game(
+            title=form.title.data,
+            release_year=form.release_year.data,
+            platform=form.platform.data,
+            cover=cover_filename,
+        )
+        db.session.add(game)
+        db.session.commit()
+
+        user_game = UserGame(
+            user_id=current_user.id,
+            game_id=game.id,
+            hours_played=form.hours_played.data or 0,
+            rating=form.rating.data,
+            imported_from="manual",
+        )
+        db.session.add(user_game)
+        db.session.commit()
+
+        flash("Гра додана до вашої бібліотеки!", "success")
+        return redirect(url_for("game_list"))
+    return render_template("games/add.html", form=form)
+
 
 @app.route("/import")
 @login_required
