@@ -1,19 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Моя бібліотека - Game Library{% endblock %}
+{% block title %}Gamers History{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Моя бібліотека ігор</h1>
-
-    <!-- Форма для пошуку -->
-    <form method="GET" action="{{ url_for('search_games') }}" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="query" class="form-control" placeholder="Пошук гри..." value="{{ request.args.get('query', '') }}">
-            <button class="btn btn-primary" type="submit">Пошук</button>
-        </div>
-    </form>
-
+<div class="container mt-1">
     {% if games is defined %}
         {% if games %}
             <h2>Результати пошуку:</h2>
@@ -35,6 +25,11 @@
 
                             <!-- Додати гру до бібліотеки -->
                             <form method="POST" action="{{ url_for('add_game_to_library', game_id=game['id']) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="title" value="{{ game['name'] }}">
+                                <input type="hidden" name="platform" value="{{ game['platforms'][0]['platform']['name'] if game['platforms'] else 'Невідомо' }}">
+                                <input type="hidden" name="release_year" value="{{ game['released'][:4] if game['released'] else '' }}">
+                                <input type="hidden" name="cover_url" value="{{ game['background_image'] }}">
                                 <button type="submit" class="btn btn-primary btn-sm">Додати до бібліотеки</button>
                             </form>
                         </div>
@@ -48,7 +43,7 @@
     {% endif %}
 
     <!-- Відображення бібліотеки користувача -->
-    <h2 class="mt-5">Мої ігри</h2>
+    <h2 class="mt-2">Мої ігри</h2>
 
     {% if user_games %}
     <div class="row">
@@ -56,7 +51,13 @@
         <div class="col-md-4 mb-4">
             <div class="card">
                 {% if user_game.game.cover %}
-                    <img src="{{ url_for('static', filename='uploads/' ~ user_game.game.cover) }}" class="card-img-top" alt="Cover Image">
+                    {% if 'http' in user_game.game.cover %}
+                        <!-- Якщо cover — це зовнішній URL -->
+                        <img src="{{ user_game.game.cover }}" class="card-img-top" alt="Cover Image">
+                    {% else %}
+                        <!-- Якщо cover — це локальний файл -->
+                        <img src="{{ url_for('static', filename='uploads/' ~ user_game.game.cover) }}" class="card-img-top" alt="Cover Image">
+                    {% endif %}
                 {% else %}
                     <div class="card-img-top" style="height: 200px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center;">
                         <span class="text-muted">Немає обкладинки</span>
@@ -68,14 +69,13 @@
                     <p class="card-text">Рік випуску: {{ user_game.game.release_year or '—' }}</p>
                     <p class="card-text">Години зіграно: {{ user_game.hours_played or 0 }}</p>
                     <p class="card-text">Оцінка: {{ user_game.rating or '—' }}</p>
-                    <a href="{{ url_for('delete_user_game', game_id=user_game.game.id) }}" class="btn btn-danger btn-sm">Видалити</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p class="text-muted">У вас ще немає доданих ігор в бібліотеці. Додайте гру!</p>
+        <p class="text-muted">У вас ще немає доданих ігор в бібліотеці. Додайте гру!</p>
     {% endif %}
 </div>
 {% endblock %}

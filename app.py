@@ -1,6 +1,7 @@
 import os
 import time
 import requests
+import urllib.request
 from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_migrate import Migrate
@@ -67,17 +68,198 @@ def home():
 @app.route("/games")
 @login_required
 def game_list():
-    view = request.args.get('view', 'list')  # Отримуємо параметр 'view', або використовуємо 'list' за замовчуванням
+    view = request.args.get('view', 'list')
+    query = request.args.get('query', '')  # RAWG пошук
     user_games = UserGame.query.filter_by(user_id=current_user.id).all()
 
-    # Вибір шаблону на основі параметра 'view'
-    if view == 'tiles':
-        template = "games/tiles.html"
+    games = []
+    if query:
+        params = {'key': API_KEY, 'search': query, 'page_size': 10}
+        response = requests.get(BASE_URL, params=params)
+        if response.status_code == 200:
+            games = response.json().get('results', [])
+        else:
+            flash("Не вдалося знайти ігри, спробуйте ще раз", "danger")
+
+    template = "games/tiles.html" if view == 'tiles' else "games/list.html"
+    return render_template(template, user_games=user_games, games=games)
+
+# --- Додавання гри з пошуку RAWG або вручну ---
+import os
+import time
+import requests
+import urllib.request
+from dotenv import load_dotenv
+from flask import Flask, render_template, redirect, url_for, flash, request
+from flask_migrate import Migrate
+from flask_login import login_user, logout_user, login_required, LoginManager, current_user
+from werkzeug.utils import secure_filename
+from forms import RegistrationForm, LoginForm, AddGameForm, ProfileForm, PasswordChangeForm, DeleteAccountForm
+from models import db, User, Game, UserGame
+from werkzeug.security import check_password_hash
+from werkzeug.datastructures import FileStorage
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import generate_csrf
+
+
+# Завантаження .env
+load_dotenv()
+
+# Ваш ключ API RAWG
+API_KEY = 'fc0914e8d7e74e52a6d030cf75ee1309'
+BASE_URL = 'https://api.rawg.io/api/games'
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gamelibrary.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+
+# Завантаження обкладинок
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['AVATAR_UPLOAD_FOLDER'] = 'static/avatars'
+os.makedirs(app.config['AVATAR_UPLOAD_FOLDER'], exist_ok=True)
+
+db.init_app(app)
+migrate = Migrate(app, db)
+
+# Flask-Login
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
+
+csrf = CSRFProtect(app)
+
+# щоб мати csrf_token() у всіх шаблонах
+@app.context_processor
+def csrf_token_processor():
+    return dict(csrf_token=generate_csrf)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
+
+@app.route("/")
+@login_required
+def home():
+    # Отримуємо ігри поточного користувача з таблиці UserGame
+    user_games = UserGame.query.filter_by(user_id=current_user.id).all()
+    
+    # Передаємо ігри на шаблон
+    return render_template("index.html", user_games=user_games)
+
+@app.route("/games")
+@login_required
+def game_list():
+    view = request.args.get('view', 'list')
+    query = request.args.get('query', '')  # RAWG пошук
+    user_games = UserGame.query.filter_by(user_id=current_user.id).all()
+
+    games = []
+    if query:
+        params = {'key': API_KEY, 'search': query, 'page_size': 10}
+        response = requests.get(BASE_URL, params=params)
+        if response.status_code == 200:
+            games = response.json().get('results', [])
+        else:
+            flash("Не вдалося знайти ігри, спробуйте ще раз", "danger")
+
+    template = "games/tiles.html" if view == 'tiles' else "games/list.html"
+    return render_template(template, user_games=user_games, games=games)
+
+# --- Додавання гри з пошуку RAWG або вручну ---
+@app.route("/games/add/<int:game_id>", methods=["POST"])
+@login_required
+def add_game_to_library(game_id):
+    game = Game.query.get(game_id)
+
+    if not game:
+        # Дані гри з форми (RAWG або ручне додавання)
+        title = request.form.get('title') or "Невідома гра"
+        platform = request.form.get('platform') or "Невідомо"
+        release_year = request.form.get('release_year')
+        cover_url = request.form.get('cover_url')
+
+        cover_filename = None
+        if cover_url:
+            try:
+                r = requests.get(cover_url)
+                if r.status_code == 200:
+                    ext = cover_url.rsplit('.', 1)[-1].split('?')[0]
+                    cover_filename = f"{game_id}_{int(time.time())}.{ext}"
+                    with open(os.path.join(app.config['UPLOAD_FOLDER'], cover_filename), 'wb') as f:
+                        f.write(r.content)
+            except Exception:
+                cover_filename = None
+
+        game = Game(
+            id=game_id,
+            title=title,
+            platform=platform,
+            release_year=release_year,
+            cover=cover_filename
+        )
+        db.session.add(game)
+        db.session.commit()
+
+    # Перевірка, чи вже є у бібліотеці користувача
+    existing_link = UserGame.query.filter_by(user_id=current_user.id, game_id=game.id).first()
+    if existing_link:
+        flash("Ця гра вже є у вашій бібліотеці.", "warning")
     else:
-        template = "games/list.html"
+        user_game = UserGame(
+            user_id=current_user.id,
+            game_id=game.id,
+            hours_played=0,
+            rating=0,
+            imported_from="rawg"  # або "manual", залежно від джерела
+        )
+        db.session.add(user_game)
+        db.session.commit()
+        flash("Гра додана до вашої бібліотеки!", "success")
 
-    return render_template(template, user_games=user_games)
+    return redirect(request.referrer or url_for('game_list'))
 
+
+# --- Редагування гри ---
+@app.route("/games/<int:game_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_game(game_id):
+    user_game = UserGame.query.filter_by(user_id=current_user.id, game_id=game_id).first()
+    if not user_game:
+        flash("Цієї гри немає у вашій бібліотеці", "warning")
+        return redirect(url_for("game_list"))
+
+    form = AddGameForm(obj=user_game.game)
+
+    if form.validate_on_submit():
+        # Оновлюємо дані гри
+        user_game.game.title = form.title.data
+        user_game.game.platform = form.platform.data
+        user_game.game.release_year = form.release_year.data
+
+        # Оновлюємо дані про користувача
+        user_game.hours_played = form.hours_played.data or 0
+        user_game.rating = form.rating.data
+
+        # Обробка обкладинки (тільки якщо завантажено новий файл)
+        if form.cover.data and isinstance(form.cover.data, FileStorage):
+            if allowed_file(form.cover.data.filename):
+                filename = secure_filename(form.cover.data.filename)
+                form.cover.data.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                user_game.game.cover = filename
+
+        db.session.commit()
+        flash("Дані гри оновлено", "success")
+        return redirect(url_for("game_list"))
+
+    return render_template("games/edit.html", form=form, user_game=user_game)
+
+# --- Ручне додавання гри через форму ---
 @app.route("/games/add", methods=["GET", "POST"])
 @login_required
 def add_game():
@@ -90,6 +272,7 @@ def add_game():
             form.cover.data.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             cover_filename = filename
 
+        # Створюємо гру
         game = Game(
             title=form.title.data,
             release_year=form.release_year.data,
@@ -99,6 +282,7 @@ def add_game():
         db.session.add(game)
         db.session.commit()
 
+        # Додаємо у бібліотеку користувача
         user_game = UserGame(
             user_id=current_user.id,
             game_id=game.id,
@@ -111,8 +295,8 @@ def add_game():
 
         flash("Гра додана до вашої бібліотеки!", "success")
         return redirect(url_for("game_list"))
-    return render_template("games/add.html", form=form)
 
+    return render_template("games/add.html", form=form)
 
 @app.route("/import")
 @login_required
@@ -289,16 +473,28 @@ def privacy_policy():
 
 @app.route("/search", methods=["GET"])
 def search_games():
-    query = request.args.get('query', '')  # Отримуємо запит користувача
+    query = request.args.get('query', '')
     if not query:
         flash("Будь ласка, введіть назву гри для пошуку", "warning")
         return redirect(url_for('home'))
+
+    params = {'key': API_KEY, 'search': query, 'page_size': 10}
+    response = requests.get(BASE_URL, params=params)
+    if response.status_code == 200:
+        games = response.json().get('results', [])
+    else:
+        games = []
+        flash("Не вдалося знайти ігри, спробуйте ще раз", "danger")
+
+    # Передаємо справжні ігри користувача
+    user_games = UserGame.query.filter_by(user_id=current_user.id).all()
+    return render_template('index.html', user_games=user_games, games=games)
 
     # Параметри запиту до API
     params = {
         'key': API_KEY,
         'search': query,
-        'page_size': 10  # Обмежуємо кількість результатів
+        'page_size': 20  # Обмежуємо кількість результатів
     }
 
     # Виконання запиту до API

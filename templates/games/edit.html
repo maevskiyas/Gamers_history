@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Редагування гри — {{ user_game.game.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Редагування гри: {{ user_game.game.title }}</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+        <div class="mb-3">
+            {{ form.title.label }} {{ form.title(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.platform.label }} {{ form.platform(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.release_year.label }} {{ form.release_year(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.hours_played.label }} {{ form.hours_played(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.rating.label }} {{ form.rating(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.cover.label }} {{ form.cover(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-success">Зберегти</button>
+        <a href="{{ url_for('game_list') }}" class="btn btn-secondary">Скасувати</a>
+    </form>
+</div>
+{% endblock %}
