@@ -17,17 +17,20 @@
     </div>
   </div>
 
-  <!-- Пошук RAWG -->
+  <!-- Search RAWG -->
   <form method="GET" action="{{ url_for('game_list', view='tiles') }}" class="mb-3">
     <div class="input-group">
-      <input type="text" name="query" class="form-control"
-             placeholder="{{ _('Search for a game...') }}"
-             value="{{ request.args.get('query', '') }}">
+      <input
+        type="text"
+        name="query"
+        class="form-control"
+        placeholder="{{ _('Search for a game...') }}"
+        value="{{ request.args.get('query', '') }}">
       <button class="btn btn-primary" type="submit">{{ _('Search') }}</button>
     </div>
   </form>
 
-  <!-- 1) МОЇ ІГРИ (ПЕРШИМИ) -->
+  <!-- 1) MY GAMES (FIRST) -->
   {% if user_games and user_games|length %}
     <div class="row">
       {% for link in user_games %}
@@ -45,16 +48,22 @@
                 <div class="text-muted">{{ _('No cover') }}</div>
               {% endif %}
             </div>
+
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">{{ link.game.title }}</h5>
               <p class="card-text mb-1">{{ _('Platform:') }} {{ link.game.platform }}</p>
               <p class="card-text mb-1">{{ _('Year:') }} {{ link.game.release_year or '—' }}</p>
               <p class="card-text mb-1">{{ _('Hours:') }} {{ link.hours_played or 0 }}</p>
               <p class="card-text mb-3">{{ _('Rating:') }} {{ link.rating or '—' }}</p>
+
               <div class="mt-auto d-flex gap-2">
                 <a href="{{ url_for('edit_game', game_id=link.game.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</a>
-                <form method="POST" action="{{ url_for('delete_user_game', game_id=link.game.id) }}?view=tiles" class="m-0"
-                      onsubmit="return confirm('{{ _('Delete this game?') }}');">
+
+                <!-- Delete form (confirmation handled by JS below) -->
+                <form method="POST"
+                      action="{{ url_for('delete_user_game', game_id=link.game.id) }}?view=tiles"
+                      class="m-0 js-confirm"
+                      data-confirm="{{ _('Delete this game?') }}">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <button type="submit" class="btn btn-sm btn-outline-danger">{{ _('Delete') }}</button>
                 </form>
@@ -71,10 +80,11 @@
     </div>
   {% endif %}
 
-  <!-- 2) ПОШУК / ТОП-10 RAWG (ПІСЛЯ МОЇХ ІГОР) -->
+  <!-- 2) RAWG SEARCH / TOP-10 (AFTER MY GAMES) -->
   {% if games and games|length %}
     <hr>
     <h4>{% if query %}{{ _('Search results:') }}{% else %}{{ _('Popular now') }}{% endif %}</h4>
+
     <div class="row">
       {% for game in games %}
         <div class="col-md-4 mb-3">
@@ -86,10 +96,12 @@
                 <div class="text-muted">{{ _('No cover') }}</div>
               {% endif %}
             </div>
+
             <div class="card-body">
               <h5 class="card-title">{{ game.name }}</h5>
               <p class="card-text">{{ _('Platform:') }} {{ game.platforms[0].platform.name if game.platforms else '—' }}</p>
               <p class="card-text">{{ _('Year:') }} {{ game.released[:4] if game.released else '—' }}</p>
+
               <form method="POST" action="{{ url_for('add_game_to_library', game_id=game.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="title" value="{{ game.name }}">
@@ -106,4 +118,16 @@
   {% endif %}
 
 </div>
+
+<!-- Small JS helper to confirm deletes -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('form.js-confirm').forEach(function (f) {
+    var msg = f.getAttribute('data-confirm') || 'Delete?';
+    f.addEventListener('submit', function (e) {
+      if (!window.confirm(msg)) e.preventDefault();
+    });
+  });
+});
+</script>
 {% endblock %}
