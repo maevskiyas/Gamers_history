@@ -3,7 +3,8 @@ __pycache__/
 *.pyc
 *.db
 venv/
-/static/uploads/
+static/uploads/*
+!static/uploads/.gitkeep
 /static/avatars/
 /venv/
 __pycache__/
