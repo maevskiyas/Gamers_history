@@ -10,3 +10,4 @@ static/uploads/*
 __pycache__/
 *.db
 .env
+backup/
