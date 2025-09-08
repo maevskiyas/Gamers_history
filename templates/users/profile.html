@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Профіль користувача{% endblock %}
+{% block title %}{{ _('User Profile') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5" style="max-width: 600px;">
-    <h2 class="mb-4 text-center">Профіль користувача</h2>
+    <h2 class="mb-4 text-center">{{ _('User Profile') }}</h2>
 
     <div class="d-flex align-items-center mb-4">
-        <!-- Якщо користувач має аватар -->
         {% if current_user.avatar %}
-            <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar) }}" class="rounded-circle me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="Аватар">
+            <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar) }}"
+                 class="rounded-circle me-3"
+                 style="width: 80px; height: 80px; object-fit: cover;"
+                 alt="{{ _('Avatar') }}">
         {% else %}
-            <!-- Якщо аватару немає, відображаємо ініціали -->
-            <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded-circle me-3" style="width: 80px; height: 80px;">
+            <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded-circle me-3"
+                 style="width: 80px; height: 80px;">
                 <span class="fw-bold">{{ current_user.username[0]|upper }}</span>
             </div>
         {% endif %}
@@ -22,7 +24,6 @@
         </div>
     </div>
 
-    <!-- Форма для зміни даних профілю -->
     <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
 
@@ -39,23 +40,24 @@
         <div class="mb-3">
             {{ form.avatar.label(class="form-label") }}
             {{ form.avatar(class="form-control") }}
-            <div class="form-text">Максимальний розмір: 2 МБ. Підтримуються формати: jpg, png, gif.</div>
+            <div class="form-text">
+                {{ _('Max size: 2 MB. Supported formats: jpg, png, gif.') }}
+            </div>
         </div>
 
         <div class="d-grid">
-            <button type="submit" class="btn btn-success">Оновити профіль</button>
+            <button type="submit" class="btn btn-success">{{ _('Update profile') }}</button>
         </div>
     </form>
 
-    <!-- Кнопки для зміни пароля та видалення акаунту -->
     <div class="mt-4">
-        <h4>Зміна пароля</h4>
-        <a href="{{ url_for('change_password') }}" class="btn btn-outline-secondary">Змінити пароль</a>
+        <h4>{{ _('Change password') }}</h4>
+        <a href="{{ url_for('change_password') }}" class="btn btn-outline-secondary">{{ _('Change password') }}</a>
     </div>
 
     <div class="mt-4">
-        <h4>Видалення акаунту</h4>
-        <a href="{{ url_for('delete_account') }}" class="btn btn-outline-danger">Видалити акаунт</a>
+        <h4>{{ _('Delete account') }}</h4>
+        <a href="{{ url_for('delete_account') }}" class="btn btn-outline-danger">{{ _('Delete account') }}</a>
     </div>
     <div class="mt-4"></div>
 </div>

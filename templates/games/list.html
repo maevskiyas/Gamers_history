@@ -1,77 +1,46 @@
 {% extends "base.html" %}
 
-{% block title %}Моя бібліотека ігор — список{% endblock %}
+{% block title %}{{ _('My Game Library — List') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-3">
 
   <!-- Заголовок + кнопки -->
   <div class="d-flex justify-content-between align-items-center mb-2">
-    <h2 class="mb-0">Моя бібліотека ігор</h2>
+    <h2 class="mb-0">{{ _('My Game Library') }}</h2>
     <div class="d-flex gap-2">
-      <a href="{{ url_for('add_game') }}" class="btn btn-primary">Додати гру вручну</a>
+      <a href="{{ url_for('add_game') }}" class="btn btn-primary">{{ _('Add game manually') }}</a>
       {% if request.args.get('view') == 'tiles' %}
-        <a href="{{ url_for('game_list', view='list') }}" class="btn btn-outline-secondary">Показати списком</a>
+        <a href="{{ url_for('game_list', view='list') }}" class="btn btn-outline-secondary">{{ _('Show as list') }}</a>
       {% else %}
-        <a href="{{ url_for('game_list', view='tiles') }}" class="btn btn-outline-secondary">Показати плитками</a>
+        <a href="{{ url_for('game_list', view='tiles') }}" class="btn btn-outline-secondary">{{ _('Show as tiles') }}</a>
       {% endif %}
     </div>
   </div>
 
-  <!-- Пошук RAWG -->
-  <form method="GET" action="{{ url_for('game_list') }}" class="mb-3">
+  <!-- Пошук RAWG (форма лишається зверху) -->
+  <form method="GET" action="{{ url_for('game_list', view='list') }}" class="mb-3">
     <div class="input-group">
-      <input type="text" name="query" class="form-control" placeholder="Пошук гри..." value="{{ request.args.get('query', '') }}">
-      <button class="btn btn-primary" type="submit">Пошук</button>
+      <input type="text" name="query" class="form-control"
+             placeholder="{{ _('Search for a game...') }}"
+             value="{{ request.args.get('query', '') }}">
+      <button class="btn btn-primary" type="submit">{{ _('Search') }}</button>
     </div>
   </form>
 
-    <!-- Вивід результатів пошуку RAWG -->
-  {% if games and games|length %}
-    <hr>
-    <h4>Результати пошуку:</h4>
-    <div class="row">
-      {% for game in games %}
-        <div class="col-md-4 mb-3">
-          <div class="card">
-            <div class="card-img-top" style="height:150px; display:flex; justify-content:center; align-items:center; background:#f0f0f0;">
-              {% if game.background_image %}
-                <img src="{{ game.background_image }}" class="img-fluid" style="height:100%; width:100%; object-fit:cover;" alt="cover">
-              {% else %}
-                <div class="text-muted">Немає</div>
-              {% endif %}
-            </div>
-            <div class="card-body">
-              <h5 class="card-title">{{ game.name }}</h5>
-              <p class="card-text">Платформа: {{ game.platforms[0].platform.name if game.platforms else '—' }}</p>
-              <p class="card-text">Рік: {{ game.released[:4] if game.released else '—' }}</p>
-              <form method="POST" action="{{ url_for('add_game_to_library', game_id=game.id) }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="title" value="{{ game.name }}">
-                <input type="hidden" name="platform" value="{{ game.platforms[0].platform.name if game.platforms else '' }}">
-                <input type="hidden" name="release_year" value="{{ game.released[:4] if game.released else '' }}">
-                <input type="hidden" name="cover_url" value="{{ game.background_image }}">
-                <button type="submit" class="btn btn-sm btn-primary mt-2">Додати до бібліотеки</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-
+  <!-- 1) МОЇ ІГРИ (ПЕРШИМИ) -->
   {% if user_games and user_games|length %}
     <div class="table-responsive">
       <table class="table table-striped align-middle">
         <thead>
         <tr>
-          <th style="width:90px;">Обкладинка</th>
-          <th>Назва</th>
-          <th>Платформа</th>
-          <th>Рік</th>
-          <th>Години</th>
-          <th>Оцінка</th>
-          <th class="text-end" style="width:200px;">Дії</th>
+          <th style="width:90px;">{{ _('Cover') }}</th>
+          <th>{{ _('Title') }}</th>
+          <th>{{ _('Platform') }}</th>
+          <th>{{ _('Year') }}</th>
+          <th>{{ _('Hours') }}</th>
+          <th>{{ _('Rating') }}</th>
+          <th class="text-end" style="width:200px;">{{ _('Actions') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -86,7 +55,7 @@
                   <img src="{{ url_for('static', filename='uploads/' ~ cover) }}" class="img-fluid rounded" style="width:100px; height:80px; object-fit:cover;" alt="cover">
                 {% endif %}
               {% else %}
-                <div class="bg-light text-muted d-flex align-items-center justify-content-center rounded" style="height:80px; width:100px;">Немає</div>
+                <div class="bg-light text-muted d-flex align-items-center justify-content-center rounded" style="height:80px; width:100px;">{{ _('No cover') }}</div>
               {% endif %}
             </td>
             <td class="fw-semibold">{{ link.game.title }}</td>
@@ -96,10 +65,10 @@
             <td>{{ link.rating or '—' }}</td>
             <td class="text-end">
               <div class="d-flex gap-2 justify-content-end">
-                <a href="{{ url_for('edit_game', game_id=link.game.id) }}" class="btn btn-sm btn-outline-primary">Редагувати</a>
+                <a href="{{ url_for('edit_game', game_id=link.game.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</a>
                 <form method="POST" action="{{ url_for('delete_user_game', game_id=link.game.id) }}?view=list" class="m-0">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>
+                  <button type="submit" class="btn btn-sm btn-outline-danger">{{ _('Delete') }}</button>
                 </form>
               </div>
             </td>
@@ -110,11 +79,44 @@
     </div>
   {% else %}
     <div class="text-center py-5">
-      <p class="mb-3 text-muted">У тебе ще немає доданих ігор.</p>
-      <a href="{{ url_for('add_game') }}" class="btn btn-primary">Додати першу гру</a>
+      <p class="mb-3 text-muted">{{ _('You don\'t have any games in your library yet.') }}</p>
+      <a href="{{ url_for('add_game') }}" class="btn btn-primary">{{ _('Add your first game') }}</a>
     </div>
   {% endif %}
 
+  <!-- 2) ПОШУК / ТОП-10 RAWG (ПІСЛЯ МОЇХ ІГОР) -->
+  {% if games and games|length %}
+    <hr>
+    <h4>{% if query %}{{ _('Search results:') }}{% else %}{{ _('Popular now') }}{% endif %}</h4>
+    <div class="row">
+      {% for game in games %}
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-img-top" style="height:150px; display:flex; justify-content:center; align-items:center; background:#f0f0f0;">
+              {% if game.background_image %}
+                <img src="{{ game.background_image }}" class="img-fluid" style="height:100%; width:100%; object-fit:cover;" alt="cover">
+              {% else %}
+                <div class="text-muted">{{ _('No cover') }}</div>
+              {% endif %}
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">{{ game.name }}</h5>
+              <p class="card-text">{{ _('Platform:') }} {{ game.platforms[0].platform.name if game.platforms else '—' }}</p>
+              <p class="card-text">{{ _('Year:') }} {{ game.released[:4] if game.released else '—' }}</p>
+              <form method="POST" action="{{ url_for('add_game_to_library', game_id=game.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="title" value="{{ game.name }}">
+                <input type="hidden" name="platform" value="{{ game.platforms[0].platform.name if game.platforms else '' }}">
+                <input type="hidden" name="release_year" value="{{ game.released[:4] if game.released else '' }}">
+                <input type="hidden" name="cover_url" value="{{ game.background_image }}">
+                <button type="submit" class="btn btn-sm btn-primary mt-2">{{ _('Add to Library') }}</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
 </div>
 {% endblock %}

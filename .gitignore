@@ -3,3 +3,9 @@ __pycache__/
 *.pyc
 *.db
 venv/
+/static/uploads/
+/static/avatars/
+/venv/
+__pycache__/
+*.db
+.env

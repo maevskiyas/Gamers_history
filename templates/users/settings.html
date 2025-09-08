@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Налаштування профілю{% endblock %}
+{% block title %}{{ _('Profile settings') }}{% endblock %}
 {% block content %}
 <div class="container mt-4" style="max-width:720px;">
-  <h2 class="mb-4">Налаштування профілю</h2>
+  <h2 class="mb-4">{{ _('Profile settings') }}</h2>
 
   <div class="d-flex align-items-center mb-4">
     {% if current_user.avatar %}
-      <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar) }}" class="rounded me-3" style="width:72px;height:72px;object-fit:cover;">
+      <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar) }}" class="rounded me-3" style="width:72px;height:72px;object-fit:cover;" alt="{{ _('Avatar') }}">
     {% else %}
       <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded me-3" style="width:72px;height:72px;">
         <span>{{ current_user.username[:1] | upper }}</span>
@@ -15,8 +15,8 @@
     <div>
       <div class="fw-semibold">{{ current_user.username }}</div>
       <div class="text-muted">{{ current_user.email }}</div>
-      <a class="btn btn-sm btn-outline-secondary mt-2" href="{{ url_for('change_password') }}">Змінити пароль</a>
-      <a class="btn btn-sm btn-outline-danger mt-2" href="{{ url_for('delete_account') }}">Видалити акаунт</a>
+      <a class="btn btn-sm btn-outline-secondary mt-2" href="{{ url_for('change_password') }}">{{ _('Change password') }}</a>
+      <a class="btn btn-sm btn-outline-danger mt-2" href="{{ url_for('delete_account') }}">{{ _('Delete account') }}</a>
     </div>
   </div>
 
@@ -36,11 +36,11 @@
     <div class="mb-3">
       {{ form.avatar.label(class="form-label") }}
       {{ form.avatar(class="form-control") }}
-      <div class="form-text">Підтримка: jpg, png, gif. До 2 МБ.</div>
+      <div class="form-text">{{ _('Supported formats: jpg, png, gif. Max size: 2MB.') }}</div>
     </div>
 
     <div class="d-grid">
-      {{ form.submit(class="btn btn-primary") }}
+      {{ form.submit(class="btn btn-primary", value=_('Save changes')) }}
     </div>
   </form>
 </div>

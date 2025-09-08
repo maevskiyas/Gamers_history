@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Редагування гри — {{ user_game.game.title }}{% endblock %}
+{% block title %}{{ _('Edit game') }} — {{ user_game.game.title }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Редагування гри: {{ user_game.game.title }}</h2>
+    <h2>{{ _('Editing game:') }} {{ user_game.game.title }}</h2>
     <form method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
         <div class="mb-3">
@@ -25,8 +25,8 @@
         <div class="mb-3">
             {{ form.cover.label }} {{ form.cover(class="form-control") }}
         </div>
-        <button type="submit" class="btn btn-success">Зберегти</button>
-        <a href="{{ url_for('game_list') }}" class="btn btn-secondary">Скасувати</a>
+        <button type="submit" class="btn btn-success">{{ _('Save') }}</button>
+        <a href="{{ url_for('game_list') }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
     </form>
 </div>
 {% endblock %}

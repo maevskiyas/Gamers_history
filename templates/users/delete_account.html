@@ -1,17 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Видалення акаунта{% endblock %}
+{% block title %}{{ _('Delete account') }}{% endblock %}
 {% block content %}
 <div class="container mt-4" style="max-width:520px;">
-  <h2 class="mb-3 text-danger">Видалити акаунт</h2>
-  <p class="text-muted">Цю дію не можна скасувати. Будуть видалені всі ваші зв’язки ігор (бібліотека).</p>
+  <h2 class="mb-3 text-danger">{{ _('Delete account') }}</h2>
+  <p class="text-muted">{{ _('This action cannot be undone. All your game links (library) will be deleted.') }}</p>
   <form method="POST">
     {{ form.hidden_tag() }}
     <div class="mb-3">
       {{ form.confirm.label(class="form-label") }}
-      {{ form.confirm(class="form-control", placeholder="Введіть: DELETE") }}
+      {{ form.confirm(class="form-control", placeholder=_("Type: DELETE")) }}
     </div>
     <div class="d-grid">
-      {{ form.submit(class="btn btn-danger") }}
+      {{ form.submit(class="btn btn-danger", value=_('Delete account')) }}
     </div>
   </form>
 </div>

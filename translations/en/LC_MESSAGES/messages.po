@@ -1,0 +1,433 @@
+# English translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-09-08 22:09+0300\n"
+"PO-Revision-Date: 2025-09-08 19:24+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app.py:130 app.py:421
+msgid "Couldn't fetch games, please try again."
+msgstr ""
+
+#: app.py:132 app.py:423
+msgid "Network error while searching games."
+msgstr ""
+
+#: app.py:144
+msgid "Unknown game"
+msgstr ""
+
+#: app.py:145 templates/index.html:41 templates/index.html:45
+msgid "Unknown"
+msgstr ""
+
+#: app.py:173
+msgid "This game is already in your library."
+msgstr ""
+
+#: app.py:184 app.py:249
+msgid "Game added to your library!"
+msgstr ""
+
+#: app.py:194 app.py:263
+msgid "This game is not in your library."
+msgstr ""
+
+#: app.py:213
+msgid "Game data updated"
+msgstr ""
+
+#: app.py:261
+msgid "Game removed from your library"
+msgstr ""
+
+#: app.py:283
+msgid "Signed in successfully!"
+msgstr ""
+
+#: app.py:286
+msgid "Invalid username or password"
+msgstr ""
+
+#: app.py:301
+msgid "A user with this email already exists"
+msgstr ""
+
+#: app.py:322 app.py:348
+msgid "This email is already in use"
+msgstr ""
+
+#: app.py:334 app.py:362
+msgid "Profile updated"
+msgstr ""
+
+#: app.py:345
+msgid "This username is taken"
+msgstr ""
+
+#: app.py:372
+msgid "Wrong current password"
+msgstr ""
+
+#: app.py:376
+msgid "Password changed"
+msgstr ""
+
+#: app.py:386
+msgid "Confirmation does not match. Type DELETE."
+msgstr ""
+
+#: app.py:393
+msgid "Account deleted"
+msgstr ""
+
+#: app.py:411
+msgid "Please enter a game title"
+msgstr ""
+
+#: app.py:431
+msgid "File is too large. Max size is 2MB."
+msgstr ""
+
+#: templates/base.html:5 templates/base.html:20 templates/base.html:82
+#: templates/index.html:3
+msgid "Gamers History"
+msgstr ""
+
+#: templates/base.html:29
+msgid "My Library"
+msgstr ""
+
+#: templates/base.html:37
+msgid "Language"
+msgstr ""
+
+#: templates/base.html:48
+msgid "Hello"
+msgstr ""
+
+#: templates/base.html:52
+msgid "Log out"
+msgstr ""
+
+#: templates/auth/login.html:3 templates/auth/login.html:7
+#: templates/auth/register.html:62 templates/base.html:56
+msgid "Log in"
+msgstr ""
+
+#: templates/auth/login.html:59 templates/auth/register.html:3
+#: templates/auth/register.html:7 templates/base.html:59
+msgid "Sign up"
+msgstr ""
+
+#: templates/auth/login.html:14 templates/auth/register.html:14
+#: templates/base.html:72 templates/games/add.html:14
+msgid "Close"
+msgstr ""
+
+#: templates/base.html:82
+msgid "All rights reserved."
+msgstr ""
+
+#: templates/base.html:83 templates/terms_of_service.html:3
+#: templates/terms_of_service.html:7
+msgid "Terms of Service"
+msgstr ""
+
+#: templates/base.html:84 templates/privacy_policy.html:3
+#: templates/privacy_policy.html:7
+msgid "Privacy Policy"
+msgstr ""
+
+#: templates/index.html:11
+msgid "Start your library"
+msgstr ""
+
+#: templates/index.html:12
+msgid "Search for a game or pick from popular ones below"
+msgstr ""
+
+#: templates/games/list.html:25 templates/games/tiles.html:24
+#: templates/index.html:18
+msgid "Search for a game..."
+msgstr ""
+
+#: templates/games/list.html:27 templates/games/tiles.html:26
+#: templates/index.html:19
+msgid "Search"
+msgstr ""
+
+#: templates/games/list.html:90 templates/games/tiles.html:77
+#: templates/index.html:25
+msgid "Popular now"
+msgstr ""
+
+#: templates/index.html:32 templates/index.html:75 templates/index.html:77
+msgid "Cover image"
+msgstr ""
+
+#: templates/games/list.html:58 templates/games/list.html:99
+#: templates/games/tiles.html:45 templates/games/tiles.html:86
+#: templates/index.html:34 templates/index.html:81
+msgid "No cover"
+msgstr ""
+
+#: templates/games/list.html:39 templates/index.html:40 templates/index.html:87
+msgid "Platform"
+msgstr ""
+
+#: templates/index.html:44 templates/index.html:88
+msgid "Release year"
+msgstr ""
+
+#: templates/games/list.html:112 templates/games/tiles.html:99
+#: templates/index.html:55
+msgid "Add to Library"
+msgstr ""
+
+#: templates/index.html:63
+msgid "We couldn't load popular games. Try searching instead."
+msgstr ""
+
+#: templates/index.html:68
+msgid "My games"
+msgstr ""
+
+#: templates/index.html:91
+msgid "Hours played"
+msgstr ""
+
+#: templates/games/list.html:42 templates/index.html:92
+msgid "Rating"
+msgstr ""
+
+#: templates/privacy_policy.html:8
+msgid "This page will describe the site's privacy policy..."
+msgstr ""
+
+#: templates/terms_of_service.html:8
+msgid "This page will describe the terms of service of your site..."
+msgstr ""
+
+#: templates/auth/login.html:58
+msgid "Don't have an account?"
+msgstr ""
+
+#: templates/auth/register.html:61
+msgid "Already have an account?"
+msgstr ""
+
+#: templates/games/add.html:3 templates/games/add.html:7
+msgid "Add game"
+msgstr ""
+
+#: templates/games/add.html:25
+msgid "Enter the game title"
+msgstr ""
+
+#: templates/games/add.html:33
+msgid "e.g. 2015"
+msgstr ""
+
+#: templates/games/add.html:49
+msgid "Total hours played"
+msgstr ""
+
+#: templates/games/add.html:57
+msgid "Your rating (1–10)"
+msgstr ""
+
+#: templates/games/add.html:66
+msgid "Supported: JPG, PNG, GIF. Max: 2 MB."
+msgstr ""
+
+#: templates/games/add.html:67 templates/games/add.html:85
+msgid "No file selected"
+msgstr ""
+
+#: templates/games/add.html:74 templates/games/edit.html:28
+msgid "Save"
+msgstr ""
+
+#: templates/games/edit.html:3
+msgid "Edit game"
+msgstr ""
+
+#: templates/games/edit.html:7
+msgid "Editing game:"
+msgstr ""
+
+#: templates/games/edit.html:29
+msgid "Cancel"
+msgstr ""
+
+#: templates/games/list.html:3
+msgid "My Game Library — List"
+msgstr ""
+
+#: templates/games/list.html:10 templates/games/tiles.html:9
+msgid "My Game Library"
+msgstr ""
+
+#: templates/games/list.html:12 templates/games/tiles.html:11
+msgid "Add game manually"
+msgstr ""
+
+#: templates/games/list.html:14 templates/games/tiles.html:15
+msgid "Show as list"
+msgstr ""
+
+#: templates/games/list.html:16 templates/games/tiles.html:13
+msgid "Show as tiles"
+msgstr ""
+
+#: templates/games/list.html:37
+msgid "Cover"
+msgstr ""
+
+#: templates/games/list.html:38
+msgid "Title"
+msgstr ""
+
+#: templates/games/list.html:40
+msgid "Year"
+msgstr ""
+
+#: templates/games/list.html:41
+msgid "Hours"
+msgstr ""
+
+#: templates/games/list.html:43
+msgid "Actions"
+msgstr ""
+
+#: templates/games/list.html:68 templates/games/tiles.html:55
+msgid "Edit"
+msgstr ""
+
+#: templates/games/list.html:71 templates/games/tiles.html:59
+msgid "Delete"
+msgstr ""
+
+#: templates/games/list.html:82 templates/games/tiles.html:69
+msgid "You don't have any games in your library yet."
+msgstr ""
+
+#: templates/games/list.html:83 templates/games/tiles.html:70
+msgid "Add your first game"
+msgstr ""
+
+#: templates/games/list.html:90 templates/games/tiles.html:77
+msgid "Search results:"
+msgstr ""
+
+#: templates/games/list.html:104 templates/games/tiles.html:50
+#: templates/games/tiles.html:91
+msgid "Platform:"
+msgstr ""
+
+#: templates/games/list.html:105 templates/games/tiles.html:51
+#: templates/games/tiles.html:92
+msgid "Year:"
+msgstr ""
+
+#: templates/games/tiles.html:3
+msgid "My Game Library — Tiles"
+msgstr ""
+
+#: templates/games/tiles.html:52
+msgid "Hours:"
+msgstr ""
+
+#: templates/games/tiles.html:53
+msgid "Rating:"
+msgstr ""
+
+#: templates/games/tiles.html:57
+msgid "Delete this game?"
+msgstr ""
+
+#: templates/users/change_password.html:2
+#: templates/users/change_password.html:5
+#: templates/users/change_password.html:25 templates/users/profile.html:54
+#: templates/users/profile.html:55 templates/users/settings.html:18
+msgid "Change password"
+msgstr ""
+
+#: templates/users/delete_account.html:2 templates/users/delete_account.html:5
+#: templates/users/delete_account.html:14 templates/users/profile.html:59
+#: templates/users/profile.html:60 templates/users/settings.html:19
+msgid "Delete account"
+msgstr ""
+
+#: templates/users/delete_account.html:6
+msgid ""
+"This action cannot be undone. All your game links (library) will be "
+"deleted."
+msgstr ""
+
+#: templates/users/delete_account.html:11
+msgid "Type: DELETE"
+msgstr ""
+
+#: templates/users/profile.html:3 templates/users/profile.html:7
+msgid "User Profile"
+msgstr ""
+
+#: templates/users/profile.html:14 templates/users/settings.html:9
+msgid "Avatar"
+msgstr ""
+
+#: templates/users/profile.html:44
+msgid "Max size: 2 MB. Supported formats: jpg, png, gif."
+msgstr ""
+
+#: templates/users/profile.html:49
+msgid "Update profile"
+msgstr ""
+
+#: templates/users/reset_password.html:3 templates/users/reset_password.html:7
+msgid "Reset password"
+msgstr ""
+
+#: templates/users/reset_password.html:17
+msgid "Send reset instructions"
+msgstr ""
+
+#: templates/users/settings.html:2 templates/users/settings.html:5
+msgid "Profile settings"
+msgstr ""
+
+#: templates/users/settings.html:39
+msgid "Supported formats: jpg, png, gif. Max size: 2MB."
+msgstr ""
+
+#: templates/users/settings.html:43
+msgid "Save changes"
+msgstr ""
+
+#~ msgid "Search results"
+#~ msgstr ""
+
+#~ msgid "Add to library"
+#~ msgstr ""
+
+#~ msgid "No results for your query."
+#~ msgstr ""
+
+#~ msgid "You have no games in your library yet. Add one!"
+#~ msgstr ""
+

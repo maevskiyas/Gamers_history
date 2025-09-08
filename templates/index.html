@@ -1,81 +1,102 @@
 {% extends "base.html" %}
 
-{% block title %}Gamers History{% endblock %}
+{% block title %}{{ _('Gamers History') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-1">
-    {% if games is defined %}
-        {% if games %}
-            <h2>Результати пошуку:</h2>
-            <div class="row">
-                {% for game in games %}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        {% if game['background_image'] %}
-                            <img src="{{ game['background_image'] }}" class="card-img-top" alt="Cover Image">
-                        {% else %}
-                            <div class="card-img-top" style="height: 200px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center;">
-                                <span class="text-muted">Немає обкладинки</span>
-                            </div>
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ game['name'] }}</h5>
-                            <p class="card-text">Платформа: {{ game['platforms'][0]['platform']['name'] if game['platforms'] else 'Невідомо' }}</p>
-                            <p class="card-text">Рік випуску: {{ game['released'][:4] if game['released'] else 'Невідомо' }}</p>
+<div class="container mt-3">
 
-                            <!-- Додати гру до бібліотеки -->
-                            <form method="POST" action="{{ url_for('add_game_to_library', game_id=game['id']) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="title" value="{{ game['name'] }}">
-                                <input type="hidden" name="platform" value="{{ game['platforms'][0]['platform']['name'] if game['platforms'] else 'Невідомо' }}">
-                                <input type="hidden" name="release_year" value="{{ game['released'][:4] if game['released'] else '' }}">
-                                <input type="hidden" name="cover_url" value="{{ game['background_image'] }}">
-                                <button type="submit" class="btn btn-primary btn-sm">Додати до бібліотеки</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="text-muted">Немає результатів для вашого запиту.</p>
-        {% endif %}
-    {% endif %}
-
-    <!-- Відображення бібліотеки користувача -->
-    <h2 class="mt-2">Мої ігри</h2>
-
-    {% if user_games %}
-    <div class="row">
-        {% for user_game in user_games %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                {% if user_game.game.cover %}
-                    {% if 'http' in user_game.game.cover %}
-                        <!-- Якщо cover — це зовнішній URL -->
-                        <img src="{{ user_game.game.cover }}" class="card-img-top" alt="Cover Image">
-                    {% else %}
-                        <!-- Якщо cover — це локальний файл -->
-                        <img src="{{ url_for('static', filename='uploads/' ~ user_game.game.cover) }}" class="card-img-top" alt="Cover Image">
-                    {% endif %}
-                {% else %}
-                    <div class="card-img-top" style="height: 200px; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center;">
-                        <span class="text-muted">Немає обкладинки</span>
-                    </div>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ user_game.game.title }}</h5>
-                    <p class="card-text">Платформа: {{ user_game.game.platform }}</p>
-                    <p class="card-text">Рік випуску: {{ user_game.game.release_year or '—' }}</p>
-                    <p class="card-text">Години зіграно: {{ user_game.hours_played or 0 }}</p>
-                    <p class="card-text">Оцінка: {{ user_game.rating or '—' }}</p>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+  {% if not user_games or not user_games|length %}
+    <!-- Порожня бібліотека: показуємо пошук і топ-10 -->
+    <div class="text-center mb-4">
+      <h2 class="mb-2">{{ _('Start your library') }}</h2>
+      <p class="text-muted mb-3">{{ _('Search for a game or pick from popular ones below') }}</p>
     </div>
+
+    <!-- Пошук -->
+    <form method="GET" action="{{ url_for('search_games') }}" class="mb-4">
+      <div class="input-group input-group-lg">
+        <input type="text" name="query" class="form-control" placeholder="{{ _('Search for a game...') }}">
+        <button class="btn btn-primary" type="submit">{{ _('Search') }}</button>
+      </div>
+    </form>
+
+    <!-- Популярні ігри -->
+    {% if popular_games and popular_games|length %}
+      <h4 class="mb-3">{{ _('Popular now') }}</h4>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-3">
+        {% for game in popular_games %}
+          <div class="col">
+            <div class="card h-100 shadow-sm">
+              <div class="card-img-top" style="height:165px; background:#f6f6f6; display:flex; align-items:center; justify-content:center;">
+                {% if game.background_image %}
+                  <img src="{{ game.background_image }}" alt="{{ _('Cover image') }}" style="width:100%; height:100%; object-fit:cover;">
+                {% else %}
+                  <div class="text-muted small">{{ _('No cover') }}</div>
+                {% endif %}
+              </div>
+              <div class="card-body">
+                <div class="fw-semibold mb-1" style="min-height: 2.4em">{{ game.name }}</div>
+                <div class="text-muted small">
+                  {{ _('Platform') }}:
+                  {{ game.platforms[0].platform.name if game.platforms else _('Unknown') }}
+                </div>
+                <div class="text-muted small">
+                  {{ _('Release year') }}:
+                  {{ game.released[:4] if game.released else _('Unknown') }}
+                </div>
+              </div>
+              <div class="card-footer bg-white border-0 pt-0 pb-3 d-flex justify-content-end">
+                <form method="POST" action="{{ url_for('add_game_to_library', game_id=game.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="title" value="{{ game.name }}">
+                  <input type="hidden" name="platform" value="{{ game.platforms[0].platform.name if game.platforms else '' }}">
+                  <input type="hidden" name="release_year" value="{{ game.released[:4] if game.released else '' }}">
+                  <input type="hidden" name="cover_url" value="{{ game.background_image }}">
+                  <button type="submit" class="btn btn-sm btn-primary">{{ _('Add to Library') }}</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     {% else %}
-        <p class="text-muted">У вас ще немає доданих ігор в бібліотеці. Додайте гру!</p>
+      <p class="text-muted">{{ _("We couldn't load popular games. Try searching instead.") }}</p>
     {% endif %}
+
+  {% else %}
+    <!-- НЕ порожня бібліотека: показуємо твої ігри (як було раніше) -->
+    <h2 class="mb-3">{{ _('My games') }}</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+      {% for user_game in user_games %}
+        <div class="col">
+          <div class="card h-100">
+            {% if user_game.game.cover %}
+              {% if 'http' in user_game.game.cover %}
+                <img src="{{ user_game.game.cover }}" class="card-img-top" alt="{{ _('Cover image') }}">
+              {% else %}
+                <img src="{{ url_for('static', filename='uploads/' ~ user_game.game.cover) }}" class="card-img-top" alt="{{ _('Cover image') }}">
+              {% endif %}
+            {% else %}
+              <div class="card-img-top d-flex align-items-center justify-content-center bg-light text-muted" style="height:200px;">
+                {{ _('No cover') }}
+              </div>
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ user_game.game.title }}</h5>
+              <div class="small text-muted mb-2">
+                {{ _('Platform') }}: {{ user_game.game.platform }} •
+                {{ _('Release year') }}: {{ user_game.game.release_year or '—' }}
+              </div>
+              <div class="small">
+                {{ _('Hours played') }}: {{ user_game.hours_played or 0 }} <br>
+                {{ _('Rating') }}: {{ user_game.rating or '—' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
 </div>
 {% endblock %}

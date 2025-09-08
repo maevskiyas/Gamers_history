@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Додати гру{% endblock %}
+{% block title %}{{ _('Add game') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5" style="max-width: 600px;">
-    <h2 class="mb-4 text-center">Додати гру</h2>
+    <h2 class="mb-4 text-center">{{ _('Add game') }}</h2>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
     {% endwith %}
 
     <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_game') }}">
@@ -22,7 +22,7 @@
 
         <div class="mb-3">
             {{ form.title.label(class="form-label") }}
-            {{ form.title(class="form-control") }}
+            {{ form.title(class="form-control", placeholder=_('Enter the game title')) }}
             {% if form.title.errors %}
                 <div class="text-danger">{{ form.title.errors[0] }}</div>
             {% endif %}
@@ -30,7 +30,7 @@
 
         <div class="mb-3">
             {{ form.release_year.label(class="form-label") }}
-            {{ form.release_year(class="form-control") }}
+            {{ form.release_year(class="form-control", placeholder=_('e.g. 2015')) }}
             {% if form.release_year.errors %}
                 <div class="text-danger">{{ form.release_year.errors[0] }}</div>
             {% endif %}
@@ -46,7 +46,7 @@
 
         <div class="mb-3">
             {{ form.hours_played.label(class="form-label") }}
-            {{ form.hours_played(class="form-control") }}
+            {{ form.hours_played(class="form-control", placeholder=_('Total hours played')) }}
             {% if form.hours_played.errors %}
                 <div class="text-danger">{{ form.hours_played.errors[0] }}</div>
             {% endif %}
@@ -54,7 +54,7 @@
 
         <div class="mb-3">
             {{ form.rating.label(class="form-label") }}
-            {{ form.rating(class="form-control") }}
+            {{ form.rating(class="form-control", placeholder=_('Your rating (1–10)')) }}
             {% if form.rating.errors %}
                 <div class="text-danger">{{ form.rating.errors[0] }}</div>
             {% endif %}
@@ -62,15 +62,35 @@
 
         <div class="mb-3">
             {{ form.cover.label(class="form-label") }}
-            {{ form.cover(class="form-control") }}
+            {{ form.cover(class="form-control", id="cover-input") }}
+            <div class="form-text" id="cover-help">{{ _('Supported: JPG, PNG, GIF. Max: 2 MB.') }}</div>
+            <div class="form-text" id="cover-filename">{{ _('No file selected') }}</div>
             {% if form.cover.errors %}
                 <div class="text-danger">{{ form.cover.errors[0] }}</div>
             {% endif %}
         </div>
 
         <div class="d-grid">
-            {{ form.submit(class="btn btn-success") }}
+            {{ form.submit(class="btn btn-success", value=_('Save')) }}
         </div>
     </form>
 </div>
+
+<script>
+  (function () {
+    const input = document.getElementById('cover-input');
+    const label = document.getElementById('cover-filename');
+    if (!input || !label) return;
+
+    const noFileText = "{{ _('No file selected') }}";
+
+    input.addEventListener('change', function () {
+      if (this.files && this.files.length > 0) {
+        label.textContent = this.files[0].name;
+      } else {
+        label.textContent = noFileText;
+      }
+    });
+  })();
+</script>
 {% endblock %}
