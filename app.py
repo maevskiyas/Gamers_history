@@ -26,7 +26,7 @@ from models import db, User, Game, UserGame
 
 load_dotenv()
 
-API_KEY = 'fc0914e8d7e74e52a6d030cf75ee1309'
+API_KEY = os.getenv("RAWG_API_KEY")
 BASE_URL = 'https://api.rawg.io/api/games'
 
 app = Flask(__name__)
