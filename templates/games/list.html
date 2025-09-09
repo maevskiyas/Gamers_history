@@ -1,24 +1,24 @@
 {% extends "base.html" %}
-
 {% block title %}{{ _('My Game Library — List') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-3">
+<div class="container mt-4">
 
-  <!-- Заголовок + кнопки -->
+  <!-- Header + switch -->
   <div class="d-flex justify-content-between align-items-center mb-2">
     <h2 class="mb-0">{{ _('My Game Library') }}</h2>
     <div class="d-flex gap-2">
       <a href="{{ url_for('add_game') }}" class="btn btn-primary">{{ _('Add game manually') }}</a>
+      {% set q = (request.args.get('query','') or '').strip() %}
       {% if request.args.get('view') == 'tiles' %}
-        <a href="{{ url_for('game_list', view='list') }}" class="btn btn-outline-secondary">{{ _('Show as list') }}</a>
+        <a href="{{ url_for('game_list', view='list', query=q) }}" class="btn btn-outline-secondary">{{ _('Show as list') }}</a>
       {% else %}
-        <a href="{{ url_for('game_list', view='tiles') }}" class="btn btn-outline-secondary">{{ _('Show as tiles') }}</a>
+        <a href="{{ url_for('game_list', view='tiles', query=q) }}" class="btn btn-outline-secondary">{{ _('Show as tiles') }}</a>
       {% endif %}
     </div>
   </div>
 
-  <!-- Пошук RAWG (форма лишається зверху) -->
+  <!-- Search -->
   <form method="GET" action="{{ url_for('game_list', view='list') }}" class="mb-3">
     <div class="input-group">
       <input type="text" name="query" class="form-control"
@@ -28,52 +28,103 @@
     </div>
   </form>
 
-  <!-- 1) МОЇ ІГРИ (ПЕРШИМИ) -->
+  {# ======== ORDER ONLY: results on top if searching ======== #}
+  {% if q and games and games|length %}
+    <div class="mb-3">
+      <h4 class="h5 mb-3">{{ _('Search results:') }}</h4>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th style="width:64px;"></th>
+              <th>{{ _('Title') }}</th>
+              <th>{{ _('Platform') }}</th>
+              <th>{{ _('Year') }}</th>
+              <th style="width:140px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for game in games %}
+              <tr>
+                <td>
+                  {% if game.background_image %}
+                    <img src="{{ game.background_image }}" alt="cover" style="width:64px;height:40px;object-fit:cover;">
+                  {% else %}
+                    <span class="text-muted">{{ _('No cover') }}</span>
+                  {% endif %}
+                </td>
+                <td class="fw-semibold text-truncate" style="max-width:260px;">{{ game.name }}</td>
+                <td class="text-nowrap">{{ game.platforms[0].platform.name if game.platforms else '—' }}</td>
+                <td class="text-nowrap">{{ game.released[:4] if game.released else '—' }}</td>
+                <td class="text-end">
+                  <form method="POST" action="{{ url_for('add_game_to_library', game_id=game.id) }}" class="m-0">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="title" value="{{ game.name }}">
+                    <input type="hidden" name="platform" value="{{ game.platforms[0].platform.name if game.platforms else '' }}">
+                    <input type="hidden" name="release_year" value="{{ game.released[:4] if game.released else '' }}">
+                    <input type="hidden" name="cover_url" value="{{ game.background_image }}">
+                    <button type="submit" class="btn btn-sm btn-primary">{{ _('Add to Library') }}</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% elif q %}
+    <p class="text-muted">{{ _('No results found.') }}</p>
+  {% endif %}
+
+  {# ======== YOUR LIST (unchanged look) ======== #}
   {% if user_games and user_games|length %}
-    <div class="table-responsive">
-      <table class="table table-striped align-middle">
+    <div class="table-responsive mb-4">
+      <table class="table table-striped table-hover table-sm align-middle">
         <thead>
-        <tr>
-          <th style="width:90px;">{{ _('Cover') }}</th>
-          <th>{{ _('Title') }}</th>
-          <th>{{ _('Platform') }}</th>
-          <th>{{ _('Year') }}</th>
-          <th>{{ _('Hours') }}</th>
-          <th>{{ _('Rating') }}</th>
-          <th class="text-end" style="width:200px;">{{ _('Actions') }}</th>
-        </tr>
+          <tr>
+            <th style="width:64px;"></th>
+            <th>{{ _('Title') }}</th>
+            <th>{{ _('Platform') }}</th>
+            <th>{{ _('Year') }}</th>
+            <th>{{ _('Hours') }}</th>
+            <th>{{ _('Rating') }}</th>
+            <th style="width:180px;"></th>
+          </tr>
         </thead>
         <tbody>
-        {% for link in user_games %}
-          {% set cover = link.game.cover %}
-          <tr>
-            <td>
-              {% if cover %}
-                {% if '://' in cover %}
-                  <img src="{{ cover }}" class="img-fluid rounded" style="width:100px; height:80px; object-fit:cover;" alt="cover">
+          {% for link in user_games %}
+            {% set cover = link.game.cover %}
+            <tr>
+              <td>
+                {% if cover %}
+                  {% if '://' in cover %}
+                    <img src="{{ cover }}" alt="cover" style="width:64px;height:40px;object-fit:cover;">
+                  {% else %}
+                    <img src="{{ url_for('static', filename='uploads/' ~ cover) }}" alt="cover" style="width:64px;height:40px;object-fit:cover;">
+                  {% endif %}
                 {% else %}
-                  <img src="{{ url_for('static', filename='uploads/' ~ cover) }}" class="img-fluid rounded" style="width:100px; height:80px; object-fit:cover;" alt="cover">
+                  <span class="text-muted">{{ _('No cover') }}</span>
                 {% endif %}
-              {% else %}
-                <div class="bg-light text-muted d-flex align-items-center justify-content-center rounded" style="height:80px; width:100px;">{{ _('No cover') }}</div>
-              {% endif %}
-            </td>
-            <td class="fw-semibold">{{ link.game.title }}</td>
-            <td>{{ link.game.platform }}</td>
-            <td>{{ link.game.release_year or '—' }}</td>
-            <td>{{ link.hours_played or 0 }}</td>
-            <td>{{ link.rating or '—' }}</td>
-            <td class="text-end">
-              <div class="d-flex gap-2 justify-content-end">
-                <a href="{{ url_for('edit_game', game_id=link.game.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</a>
-                <form method="POST" action="{{ url_for('delete_user_game', game_id=link.game.id) }}?view=list" class="m-0">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn btn-sm btn-outline-danger">{{ _('Delete') }}</button>
-                </form>
-              </div>
-            </td>
-          </tr>
-        {% endfor %}
+              </td>
+              <td class="fw-semibold">{{ link.game.title }}</td>
+              <td class="text-nowrap">{{ link.game.platform }}</td>
+              <td class="text-nowrap">{{ link.game.release_year or '—' }}</td>
+              <td class="text-nowrap">{{ link.hours_played or 0 }}</td>
+              <td class="text-nowrap">{{ link.rating or '—' }}</td>
+              <td class="text-end">
+                <div class="d-inline-flex gap-2">
+                  <a href="{{ url_for('edit_game', game_id=link.game.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</a>
+                  <form method="POST"
+                        action="{{ url_for('delete_user_game', game_id=link.game.id) }}?view=list"
+                        class="m-0 js-confirm"
+                        data-confirm="{{ _('Delete this game?') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">{{ _('Delete') }}</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -84,39 +135,62 @@
     </div>
   {% endif %}
 
-  <!-- 2) ПОШУК / ТОП-10 RAWG (ПІСЛЯ МОЇХ ІГОР) -->
-  {% if games and games|length %}
+  {# ======== Popular now only when no search OR (optionally) always beneath ======== #}
+  {% if not q and games and games|length %}
     <hr>
-    <h4>{% if query %}{{ _('Search results:') }}{% else %}{{ _('Popular now') }}{% endif %}</h4>
-    <div class="row">
-      {% for game in games %}
-        <div class="col-md-4 mb-3">
-          <div class="card">
-            <div class="card-img-top" style="height:150px; display:flex; justify-content:center; align-items:center; background:#f0f0f0;">
-              {% if game.background_image %}
-                <img src="{{ game.background_image }}" class="img-fluid" style="height:100%; width:100%; object-fit:cover;" alt="cover">
-              {% else %}
-                <div class="text-muted">{{ _('No cover') }}</div>
-              {% endif %}
-            </div>
-            <div class="card-body">
-              <h5 class="card-title">{{ game.name }}</h5>
-              <p class="card-text">{{ _('Platform:') }} {{ game.platforms[0].platform.name if game.platforms else '—' }}</p>
-              <p class="card-text">{{ _('Year:') }} {{ game.released[:4] if game.released else '—' }}</p>
-              <form method="POST" action="{{ url_for('add_game_to_library', game_id=game.id) }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="title" value="{{ game.name }}">
-                <input type="hidden" name="platform" value="{{ game.platforms[0].platform.name if game.platforms else '' }}">
-                <input type="hidden" name="release_year" value="{{ game.released[:4] if game.released else '' }}">
-                <input type="hidden" name="cover_url" value="{{ game.background_image }}">
-                <button type="submit" class="btn btn-sm btn-primary mt-2">{{ _('Add to Library') }}</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
+    <h4 class="h5 mb-3">{{ _('Popular now') }}</h4>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th style="width:64px;"></th>
+            <th>{{ _('Title') }}</th>
+            <th>{{ _('Platform') }}</th>
+            <th>{{ _('Year') }}</th>
+            <th style="width:140px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for game in games %}
+            <tr>
+              <td>
+                {% if game.background_image %}
+                  <img src="{{ game.background_image }}" alt="cover" style="width:64px;height:40px;object-fit:cover;">
+                {% else %}
+                  <span class="text-muted">{{ _('No cover') }}</span>
+                {% endif %}
+              </td>
+              <td class="fw-semibold text-truncate" style="max-width:260px;">{{ game.name }}</td>
+              <td class="text-nowrap">{{ game.platforms[0].platform.name if game.platforms else '—' }}</td>
+              <td class="text-nowrap">{{ game.released[:4] if game.released else '—' }}</td>
+              <td class="text-end">
+                <form method="POST" action="{{ url_for('add_game_to_library', game_id=game.id) }}" class="m-0">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="title" value="{{ game.name }}">
+                  <input type="hidden" name="platform" value="{{ game.platforms[0].platform.name if game.platforms else '' }}">
+                  <input type="hidden" name="release_year" value="{{ game.released[:4] if game.released else '' }}">
+                  <input type="hidden" name="cover_url" value="{{ game.background_image }}">
+                  <button type="submit" class="btn btn-sm btn-primary">{{ _('Add to Library') }}</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   {% endif %}
 
 </div>
+
+<!-- confirm delete (без inline-JS) -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('form.js-confirm').forEach(function (f) {
+    var msg = f.getAttribute('data-confirm') || 'Delete?';
+    f.addEventListener('submit', function (e) {
+      if (!window.confirm(msg)) e.preventDefault();
+    });
+  });
+});
+</script>
 {% endblock %}
