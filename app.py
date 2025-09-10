@@ -220,6 +220,17 @@ def edit_game(game_id):
 @login_required
 def add_game():
     form = AddGameForm()
+
+    # 👇 важливо: choices для SelectField (підлаштуй під свій список)
+    form.platform.choices = [
+        ("PC", "PC"),
+        ("PlayStation", "PlayStation"),
+        ("Xbox", "Xbox"),
+        ("Nintendo", "Nintendo"),
+        ("Mobile", "Mobile"),
+        ("Other", "Other"),
+    ]
+
     if form.validate_on_submit():
         cover_filename = None
         if form.cover.data and allowed_file(form.cover.data.filename):
@@ -247,9 +258,12 @@ def add_game():
         db.session.commit()
 
         flash(_("Game added to your library!"), "success")
-        return redirect(url_for("game_list"))
+        # збережемо активний вигляд (list/tiles), якщо є
+        view = request.args.get("view", "list")
+        return redirect(url_for("game_list", view=view))
 
-    return redirect(url_for('game_list'))
+    # 🟢 якщо GET або форма невалідна — показуємо форму з помилками
+    return render_template("games/add.html", form=form)
 
 @app.route("/games/<int:game_id>/delete", methods=["POST"])
 @login_required
