@@ -145,6 +145,8 @@ gamers-history/
 │── requirements.txt
 │── README.md
 
+---
+
 ## Design Decisions
 
 Flask over Django: lightweight, minimal boilerplate, perfect for CS50 project scope.
@@ -156,6 +158,8 @@ Username-based login: avoids complexity of email verification.
 Two view modes: inspired by Steam/Epic UI, giving users choice of data-focused or visual browsing.
 
 CSRF protection: all forms include CSRF tokens via Flask-WTF.
+
+---
 
 ## Internationalization
 
@@ -172,10 +176,21 @@ pybabel compile -d translations
 
 Add new language by creating a new folder under translations/ and repeating the update/compile steps.
 
+---
+
+## AI Assistance
+Some parts of this project were developed with the help of AI tools:
+- ChatGPT (OpenAI) for code snippets (form handling, pagination, etc).
+- GitHub Copilot for auto-completion in Flask routes.
+
+---
+
 ## License
 
 This project is licensed under the MIT License.
 You are free to use, modify, and distribute it, provided proper credit is given.
+
+---
 
 ## Credits
 
